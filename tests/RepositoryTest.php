@@ -4,6 +4,11 @@ use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
 {
+    public function tearDown()
+    {
+        Mockery::close();
+    }
+
     /**
      * @todo: test each scenario individually
      * @test
@@ -11,7 +16,7 @@ class RepositoryTest extends TestCase
     public function canGetSetHasDelete()
     {
         $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
-        $cache = new \Abava\Cache\Repository($pool);
+        $cache = new \Venta\Cache\Repository($pool);
         $pool->shouldReceive('hasItem')->with('key')->andReturn(false, true, false)->times(3);
 
         $this->assertFalse($cache->has('key'));
@@ -23,10 +28,10 @@ class RepositoryTest extends TestCase
 
         $pool->shouldReceive('getItem')->with('key')->andReturn(
             Mockery::mock(\Psr\Cache\CacheItemInterface::class)
-                ->shouldReceive('get')
-                ->withNoArgs()
-                ->andReturn('value')
-                ->getMock()
+                   ->shouldReceive('get')
+                   ->withNoArgs()
+                   ->andReturn('value')
+                   ->getMock()
         );
         $this->assertSame('value', $cache->get('key'));
 
@@ -39,10 +44,28 @@ class RepositoryTest extends TestCase
     /**
      * @test
      */
+    public function canPutWithDateTimeExpire()
+    {
+        $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
+        $cache = new \Venta\Cache\Repository($pool);
+
+        $pool->shouldReceive('save')->with(Mockery::on(function (\Cache\Adapter\Common\CacheItem $cacheItem) {
+            $this->assertSame('key', $cacheItem->getKey());
+            $this->assertEquals('2030-01-01 00:00:00', $cacheItem->getExpirationDate()->format('Y-m-d H:i:s'));
+
+            return true;
+        }))->andReturn(true);
+
+        $this->assertTrue($cache->put('key', 'value', new DateTime('2030-01-01 00:00:00')));
+    }
+
+    /**
+     * @test
+     */
     public function canPutWithIntExpire()
     {
         $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
-        $cache = new \Abava\Cache\Repository($pool);
+        $cache = new \Venta\Cache\Repository($pool);
 
         $pool->shouldReceive('save')->with(Mockery::on(function (\Cache\Adapter\Common\CacheItem $cacheItem) {
             $this->assertSame('key', $cacheItem->getKey());
@@ -60,7 +83,7 @@ class RepositoryTest extends TestCase
     public function canPutWithIntervalExpire()
     {
         $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
-        $cache = new \Abava\Cache\Repository($pool);
+        $cache = new \Venta\Cache\Repository($pool);
 
         $interval = new DateInterval('P1M');
 
@@ -82,28 +105,10 @@ class RepositoryTest extends TestCase
     /**
      * @test
      */
-    public function canPutWithDateTimeExpire()
-    {
-        $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
-        $cache = new \Abava\Cache\Repository($pool);
-
-        $pool->shouldReceive('save')->with(Mockery::on(function (\Cache\Adapter\Common\CacheItem $cacheItem) {
-            $this->assertSame('key', $cacheItem->getKey());
-            $this->assertEquals('2030-01-01 00:00:00', $cacheItem->getExpirationDate()->format('Y-m-d H:i:s'));
-
-            return true;
-        }))->andReturn(true);
-
-        $this->assertTrue($cache->put('key', 'value', new DateTime('2030-01-01 00:00:00')));
-    }
-
-    /**
-     * @test
-     */
     public function canPutWithoutExpire()
     {
         $pool = Mockery::mock(\Psr\Cache\CacheItemPoolInterface::class);
-        $cache = new \Abava\Cache\Repository($pool);
+        $cache = new \Venta\Cache\Repository($pool);
 
         $pool->shouldReceive('save')->with(Mockery::on(function (\Cache\Adapter\Common\CacheItem $cacheItem) {
             $this->assertSame('key', $cacheItem->getKey());
@@ -113,11 +118,6 @@ class RepositoryTest extends TestCase
         }))->andReturn(true);
 
         $this->assertTrue($cache->put('key', 'value', 'invalid time'));
-    }
-
-    public function tearDown()
-    {
-        Mockery::close();
     }
 
 }

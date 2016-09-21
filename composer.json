@@ -1,6 +1,6 @@
 {
-    "name": "abava/cache",
-    "description": "The Abava Caching package",
+    "name": "venta/cache",
+    "description": "The Venta Caching package",
     "authors": [
         {
             "name": "Konstantins Zukovs",
@@ -9,11 +9,19 @@
         {
             "name": "Alexey Rehov",
             "email": "aleksejs@scandiweb.com"
+        },
+        {
+            "name": "Vsevolods Mihailovs",
+            "email": "vsevolods@scandiweb.com"
+        },
+        {
+            "name": "Ilja Lapkovskis",
+            "email": "ilja@scandiweb.com"
         }
     ],
     "autoload": {
         "psr-4": {
-            "Abava\\Cache\\": ""
+            "Venta\\Cache\\": ""
         },
         "exclude-from-classmap": [
             "/tests/"
@@ -25,6 +33,7 @@
         "mockery/mockery": "^0.9.5"
     },
     "require": {
+        "php": "^7.0",
         "psr/cache": "^1.0",
         "cache/adapter-common": "^0.3",
         "cache/hierarchical-cache": "^0.2",
