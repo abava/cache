@@ -2,16 +2,16 @@
 
 namespace Venta\Cache;
 
-use Venta\Cache\Contract\Cache;
 use Cache\Adapter\Common\CacheItem;
 use Psr\Cache\CacheItemPoolInterface;
+use Venta\Contracts\Cache\Cache as CacheContract;
 
 /**
- * Class Repository
+ * Class Cache
  *
  * @package Venta\Cache
  */
-final class Repository implements Cache
+final class Cache implements CacheContract
 {
 
     /**
